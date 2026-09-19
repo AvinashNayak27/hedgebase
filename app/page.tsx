@@ -1,69 +1,18 @@
-import Image from "next/image";
+"use client";
+
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { AlertCircle, ArrowRight, CheckCircle2, RefreshCw, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { AssetMark } from "./components/asset-mark";
+import { BottomNav } from "./components/bottom-nav";
+import { money, quantity } from "./components/money";
+import { usePortfolio } from "./components/portfolio-provider";
+import { ProtectionRing } from "./components/protection-ring";
+import { TopBar } from "./components/top-bar";
 
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  const portfolio = usePortfolio(); const owned = portfolio.holdings.filter((item) => (item.value ?? 0) > 1);
+  return <main className="screen bg-[var(--canvas)]"><TopBar /><section className="pt-3"><p className="text-[15px] text-[var(--slate)]">Welcome back 👋</p><div className="mt-1 flex items-center justify-between"><h1 className="text-[27px] font-bold tracking-[-.04em]">Your portfolio</h1><button type="button" onClick={portfolio.refresh} aria-label="Refresh portfolio" title="Refresh portfolio" className="grid size-9 place-items-center rounded-full bg-white text-[var(--slate)] shadow-sm transition active:rotate-45"><RefreshCw size={16} /></button></div><p className="mt-3 text-[36px] font-bold tracking-[-.055em]">{portfolio.connected ? money(portfolio.totalValue) : "Connect to view"}</p><p className="mt-1 text-[13px] text-[var(--muted)]">Tokenized stocks held in your wallet</p></section>
+    {!portfolio.connected ? <section className="app-card mt-7 p-5"><div className="grid size-12 place-items-center rounded-2xl bg-[var(--blush)] text-[var(--coral)]"><ShieldCheck size={24} /></div><h2 className="mt-4 text-xl font-bold tracking-[-.03em]">See what needs protection</h2><p className="mt-2 text-sm leading-6 text-[var(--slate)]">Connect your Base wallet to read your stock holdings and existing Avantis hedges.</p><div className="mt-5"><ConnectButton label="Connect wallet" /></div></section> : <><section className="app-card mt-7 flex items-center gap-5 p-5"><ProtectionRing value={portfolio.protectionPercent} /><div><p className="text-lg font-bold">{Math.round(portfolio.protectionPercent)}% protected</p><p className="mt-1 text-[13px] text-[var(--slate)]">{money(portfolio.protectedValue)} of {money(portfolio.totalValue)}</p><p className={`mt-3 inline-flex items-center gap-1.5 text-xs font-semibold ${portfolio.protectionPercent >= 70 ? "text-[var(--green)]" : "text-[var(--amber)]"}`}>{portfolio.protectionPercent >= 70 ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}Portfolio risk: {portfolio.protectionPercent >= 70 ? "Low" : "Needs attention"}</p></div></section><div className="mt-7 flex items-center justify-between"><h2 className="text-lg font-bold">Your stocks</h2><Link href="/discover" className="text-sm font-semibold text-[var(--coral)]">Discover</Link></div><section className="mt-3 space-y-4">{owned.map((holding) => <Link href={`/stocks/${holding.market.symbol.toLowerCase()}`} key={holding.market.symbol} className="app-card block p-5"><div className="flex items-start gap-3"><AssetMark market={holding.market} /><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><div><h3 className="font-bold">{holding.market.company}</h3><p className="mt-0.5 text-xs text-[var(--muted)]">{holding.market.token}</p></div><span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${holding.status === "protected" ? "bg-[var(--mint)] text-[var(--green)]" : holding.status === "unprotected" ? "bg-[var(--amber-light)] text-[#A66A00]" : "bg-[var(--blush)] text-[var(--coral)]"}`}>{holding.status === "protected" ? "✓ Hedged" : holding.status === "unprotected" ? "Not protected" : `${Math.round(holding.coverage)}% hedged`}</span></div><p className="mt-5 text-[23px] font-bold tracking-[-.04em]">{money(holding.value)}</p><p className="mt-1 text-[13px] text-[var(--slate)]">{quantity(holding.quantity)} {holding.market.token}</p><div className="mt-4 flex items-center justify-between border-t border-[var(--divider)] pt-4"><div><p className="text-[11px] text-[var(--muted)]">Net exposure</p><p className="mt-1 text-sm font-semibold">{money(holding.netExposure)}</p></div><span className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold ${holding.status === "unprotected" ? "cta" : "bg-[var(--blush)] text-[var(--coral)]"}`}>{holding.status === "unprotected" ? "Protect" : "Manage"}<ArrowRight size={15} /></span></div></div></div></Link>)}{owned.length === 0 ? <div className="app-card p-5 text-center"><p className="font-semibold">No supported stocks found</p><p className="mt-2 text-sm text-[var(--slate)]">Buy a tokenized stock to start building a protected portfolio.</p><Link href="/discover" className="cta mt-5 inline-flex px-5 py-3 text-sm font-semibold">Discover stocks</Link></div> : null}</section></>}
+    <BottomNav /></main>;
 }
