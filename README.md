@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hedgr
 
-## Getting Started
+**Keep your stocks. Hedge the risk.**
 
-First, run the development server:
+Hedgr is an onchain portfolio protection platform that helps users hedge their tokenized stock investments against market downturns. It connects to your wallet, analyzes your stock exposure and risk, and lets you choose how much of your portfolio you want to protect. Hedgr then creates an offsetting leveraged hedge through onchain markets (via Avantis on Base), helping reduce downside risk without requiring you to sell your underlying assets.
+
+## How it works
+
+1. **Connect your Base wallet** — Hedgr reads your tokenized stock balances directly from Base mainnet. Nothing is ever deposited into Hedgr.
+2. **See your exposure** — the dashboard combines your stock holdings and any existing Avantis positions into one view: value, hedge coverage, net directional exposure, and margin health.
+3. **Choose protection** — pick how much of a position to hedge (25%, 50%, 75%, 100%) and a conservative leverage level.
+4. **Hedgr opens the offsetting short** — an opposing perpetual position is opened on Avantis, sized to match your stock exposure. You sign the transactions; Avantis executes.
+5. **Monitor and adjust** — coverage is continuously recalculated as balances and prices move, with warnings when a hedge drifts, and tools to rebalance, add or remove collateral, or close protection.
+
+Don't own the stock yet? An embedded Uniswap flow lets you swap USDC for tokenized stocks directly into your wallet, then protect them in the same session.
+
+## Non-custodial by design
+
+- Hedgr deploys **zero smart contracts** — no vaults, no pooled funds.
+- Your stocks and USDC never leave your wallet.
+- Every transaction is signed by you and executes directly against Avantis or Uniswap.
+
+## Supported assets
+
+Tokenized equities on Base, each mapped to an Avantis equity perp:
+
+| Company  | Token  | Hedge market |
+| -------- | ------ | ------------ |
+| NVIDIA   | NVDAc  | NVDA/USD     |
+| Tesla    | TSLAc  | TSLA/USD     |
+| Amazon   | AMZNc  | AMZN/USD     |
+| Meta     | METAc  | META/USD     |
+| Apple    | AAPLc  | AAPL/USD     |
+| Alphabet | GOOGLc | GOOG/USD     |
+
+## Tech stack
+
+- **Next.js + TypeScript** — app and API routes
+- **wagmi / viem / RainbowKit** — wallet connection and onchain reads on Base
+- **Avantis tx-builder API** — equity perpetual markets, positions, and hedge transactions
+- **Uniswap Trading API** — quotes, approvals, and swaps for tokenized stocks
+- **Farcaster candles API + Liveline** — price history and live charts
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable            | Used for                                        |
+| ------------------- | ----------------------------------------------- |
+| `UNISWAP_API_KEY`   | Stock prices, swap quotes, approvals, execution |
+| `FARCASTER_API_KEY` | Historical candle data for stock charts         |
 
-## Learn More
+Set them in `.env.local` (ignored by git).
 
-To learn more about Next.js, take a look at the following resources:
+## Project layout
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  api/avantis/      pairs, positions, open/manage hedge routes
+  api/uniswap/      prices, quote, approval, swap routes
+  api/market/       candle history
+  components/       portfolio engine, nav, sheets, shared UI
+  lib/markets.ts    supported stock ↔ Avantis market mapping
+  stocks/[symbol]/  detail, trade, and protect flows
+  discover/ activity/ profile/
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `prd.md` for the full product requirements and `design.md` for the design system.
