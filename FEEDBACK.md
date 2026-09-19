@@ -6,6 +6,8 @@
 
 ## What we built with Uniswap
 
+**Integration commit:** https://github.com/AvinashNayak27/hedgebase/commit/c34c7756840de7dcffbb74f6bcbb3dff2ec531e0
+
 Hedgr uses the Uniswap Trading API as the acquisition and pricing layer for tokenized equities (NVDAc, TSLAc, AMZNc, METAc, AAPLc, GOOGLc) on Base:
 
 - `POST /v1/quote` — indicative stock prices for the portfolio dashboard, plus executable buy/sell quotes in the trade flow (`app/api/uniswap/quote`, `app/api/uniswap/prices`)
