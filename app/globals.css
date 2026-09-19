@@ -1,26 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --coral: #ff625d; --coral-light: #ff817c; --blush: #fff0ee;
+  --green: #16b364; --mint: #e9f8ef; --amber: #f5a623; --amber-light: #fff5e5;
+  --risk: #d94b4b; --risk-light: #fcecec; --ink: #111318; --slate: #667085;
+  --muted: #98a2b3; --canvas: #faf9f7; --card: #ffffff; --divider: #eaecf0;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+* { box-sizing: border-box; }
+html { background: var(--canvas); }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font-geist-sans), Arial, sans-serif; }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+:focus-visible { outline: 3px solid rgba(255,98,93,.3); outline-offset: 3px; }
+.app-card { border-radius: 24px; background: var(--card); box-shadow: 0 4px 16px rgba(16,24,40,.06); }
+.cta { border-radius: 16px; background: linear-gradient(135deg, var(--coral-light), #ff5753); color: white; box-shadow: 0 8px 18px rgba(255,98,93,.22); }
+.screen { min-height: 100dvh; padding: 0 20px 112px; }
+.screen-flow { min-height: 100dvh; padding: 0 20px 32px; }
+@media (min-width: 640px) { .screen, .screen-flow { width: 420px; margin: 0 auto; } body { background: #f3f1ee; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
